@@ -1,5 +1,7 @@
 public class WaitingRoom {
 
+
+    // 1- determine the capacity of the waiting room
     private final Patient[] patients;
     private int nextPatient = 0;
     private int nextDoctor = 0;
@@ -9,9 +11,11 @@ public class WaitingRoom {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Waiting room capacity must be positive.");
         }
+        // using array to store patients in the waiting room, with a fixed capacity
         patients = new Patient[capacity];
     }
 
+    // 2- prevent a patient from entering when the room is already full
     public synchronized void enter(Patient patient) throws InterruptedException {
         while (numberOfPatients == patients.length) {
             Hospital.log("The waiting room is full.");
@@ -25,6 +29,7 @@ public class WaitingRoom {
         Hospital.log("Patient " + patient.getPatientId() + " enters the waiting room.");
     }
 
+    // The doctor takes a patient from the waiting room.
     public synchronized Patient take() throws InterruptedException {
         while (numberOfPatients == 0) {
             // Doctors wait until a patient arrives.
@@ -33,7 +38,7 @@ public class WaitingRoom {
 
         Patient patient = patients[nextDoctor];
         patients[nextDoctor] = null;
-        nextDoctor = (nextDoctor + 1) % patients.length;
+        nextDoctor = (nextDoctor + 1) % patients.length; // Circular Queue
         numberOfPatients--;
         // A removed patient creates space for another patient.
         notifyAll();
