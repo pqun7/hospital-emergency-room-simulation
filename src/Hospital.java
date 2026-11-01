@@ -1,14 +1,7 @@
 
 import java.util.Scanner;
+import java.Doctor;
 import java.util.Random;
-
-
-
-
-
-// ==========================================
-// 5. HOSPITAL (MAIN CLASS)
-// ==========================================
 
 public class Hospital {
 

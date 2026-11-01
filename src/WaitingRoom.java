@@ -1,8 +1,3 @@
-
-// ==========================================
-// 3. BOUNDED BUFFER (WAITING ROOM)
-// ==========================================
-
 class Buffer {
 
     private Patient[] store;
@@ -96,4 +91,44 @@ class Buffer {
 
         return patient;
     }
+
+    public void put(Patient patient) throws InterruptedException {
+
+        boolean stopSignal = patient.id == -1;
+
+        boolean acquired = spaces.tryAcquire(0);
+
+        if (!acquired) {
+
+            if (!stopSignal) {
+                Hospital.log("The waiting room is full.");
+
+                Hospital.log("P" + patient.id
+                        + " is waiting outside for an available seat.");
+            }
+
+            spaces.P();
+        }
+
+        try {
+            mutex.P();
+        } catch (InterruptedException e) {
+            spaces.V();
+            throw e;
+        }
+
+        store[in] = patient;
+
+        in = (in + 1) % size;
+
+        if (!stopSignal) {
+            Hospital.log("P" + patient.id
+                    + " entered the waiting room.");
+        }
+
+        mutex.V();
+
+        elements.V();
+    }
+
 }
