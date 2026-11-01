@@ -1,123 +1,92 @@
-
 import java.util.Scanner;
-import java.Doctor;
-import java.util.Random;
 
 public class Hospital {
 
-    Buffer waitingRoom;
+    private WaitingRoom waitingRoom;
+    private TreatmentRoom treatmentRoom;
+    private Semaphore completedPatients;
+    private int numberOfDoctors;
+    private int numberOfPatients;
 
-    // Exactly two treatment rooms
-    Semaphore treatmentRooms = new Semaphore(2);
-
-    // Counts completed patients
-    Semaphore completed = new Semaphore(0);
-
-    int numberOfPatients;
-    int numberOfDoctors;
-
-    public Hospital(int capacity, int doctors, int patients) {
-
-        waitingRoom = new Buffer(capacity);
-
-        numberOfDoctors = doctors;
-        numberOfPatients = patients;
-    }
-
-    // Synchronized printing to keep output organized
     public static synchronized void log(String message) {
-
         System.out.println(message);
     }
 
     public void startSimulation() throws InterruptedException {
+        Scanner scanner = new Scanner(System.in);
+
+        int waitingRoomCapacity = readPositiveInteger(
+                scanner, "Waiting room capacity: ");
+        numberOfDoctors = readPositiveInteger(
+                scanner, "Number of doctors: ");
+        numberOfPatients = readPositiveInteger(
+                scanner, "Number of patients: ");
+        scanner.close();
+
+        waitingRoom = new WaitingRoom(waitingRoomCapacity);
+        treatmentRoom = new TreatmentRoom();
+        completedPatients = new Semaphore(0);
 
         Doctor[] doctors = new Doctor[numberOfDoctors];
-
         Patient[] patients = new Patient[numberOfPatients];
 
-        // Create doctors
         for (int i = 0; i < numberOfDoctors; i++) {
-
             doctors[i] = new Doctor(i + 1, this);
-
             doctors[i].start();
         }
 
-        // Create patients
         for (int i = 0; i < numberOfPatients; i++) {
-
             patients[i] = new Patient(i + 1, this);
-
             patients[i].start();
         }
 
-        // Wait for all patient arrival threads
+        for (Patient patient : patients) {
+            // Wait for every patient thread to enter the system.
+            patient.join();
+        }
+
         for (int i = 0; i < numberOfPatients; i++) {
-
-            patients[i].join();
+            // Wait until every patient has completed treatment.
+            completedPatients.acquire();
         }
 
-        // Wait until all patients finish treatment
-        for (int i = 0; i < numberOfPatients; i++) {
-
-            completed.P();
-        }
-
-        // Send stop signals to all doctors
         for (int i = 0; i < numberOfDoctors; i++) {
-
-            waitingRoom.put(Doctor.STOP);
+            // Stop signals let doctors finish after all patients are done.
+            waitingRoom.addStopSignal();
         }
 
-        // Wait for all doctors to finish
-        for (int i = 0; i < numberOfDoctors; i++) {
-
-            doctors[i].join();
+        for (Doctor doctor : doctors) {
+            doctor.join();
         }
 
         log("All patients have been treated.");
-
         log("Simulation completed.");
     }
 
-    public static void main(String[] args) {
-
-        Scanner input = new Scanner(System.in);
-
-        System.out.print("Waiting room capacity: ");
-        int capacity = input.nextInt();
-
-        System.out.print("Number of doctors: ");
-        int doctors = input.nextInt();
-
-        System.out.print("Number of patients: ");
-        int patients = input.nextInt();
-
-        if (capacity <= 0 || doctors <= 0 || patients <= 0) {
-
-            System.out.println("All inputs must be positive.");
-
-            input.close();
-
-            return;
+    private int readPositiveInteger(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            if (scanner.hasNextInt()) {
+                int value = scanner.nextInt();
+                if (value > 0) {
+                    return value;
+                }
+            } else {
+                scanner.next();
+            }
+            System.out.println("Please enter a whole number greater than zero.");
         }
+    }
 
-        Hospital hospital =
-                new Hospital(capacity, doctors, patients);
+    public synchronized void patientFinished() {
+        completedPatients.release();
+    }
 
-        try {
+    public WaitingRoom getWaitingRoom() {
+        return waitingRoom;
+    }
 
-            hospital.startSimulation();
-
-        } catch (InterruptedException e) {
-
-            Thread.currentThread().interrupt();
-
-            System.out.println("Simulation interrupted.");
-
-        }
-
-        input.close();
+    public TreatmentRoom getTreatmentRoom() {
+        return treatmentRoom;
     }
 }

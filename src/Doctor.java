@@ -1,103 +1,63 @@
-// ==========================================
-// 4. DOCTOR
-// ==========================================
+import java.util.Random;
 
-class Doctor extends Thread {
+public class Doctor extends Thread {
 
-    int id;
+    public static final Patient STOP = new Patient(-1, null);
 
-    Hospital hospital;
-
-    static final Patient STOP = new Patient(-1, null);
-
-    Random random = new Random();
+    private final int id;
+    private final Hospital hospital;
+    private final Random random = new Random();
 
     public Doctor(int id, Hospital hospital) {
-
         this.id = id;
         this.hospital = hospital;
     }
 
     @Override
     public void run() {
-
         try {
-
             while (true) {
-
-                // Get a patient from the waiting room
-                Patient patient = hospital.waitingRoom.take();
-
-                // Stop signal
+                Patient patient = hospital.getWaitingRoom().take();
                 if (patient == STOP) {
-                    break;
+                    return;
                 }
 
+                Hospital.log("Doctor " + id + " is assigned to Patient "
+                        + patient.getPatientId() + ".");
                 Hospital.log("Doctor " + id
-                        + " is assigned to P" + patient.id + ".");
+                        + " tries to acquire a treatment room.");
 
-                Hospital.log("Doctor " + id
-                        + " is trying to acquire a treatment room.");
-
-                // Try to acquire a treatment room within 3 seconds
-                boolean acquired =
-                        hospital.treatmentRooms.tryAcquire(3000);
-
-                if (acquired) {
-
+                // Wait no longer than three seconds for a treatment room.
+                boolean acquired = hospital.getTreatmentRoom().tryAcquire(3000);
+                if (!acquired) {
                     Hospital.log("Doctor " + id
-                            + " acquired a treatment room.");
+                            + " cannot acquire a treatment room.");
+                    Hospital.log("Doctor " + id + " sends Patient "
+                            + patient.getPatientId() + " back to the waiting room.");
+                    hospital.getWaitingRoom().enter(patient);
+                    continue;
+                }
 
+                try {
+                    Hospital.log("Doctor " + id + " acquired a treatment room.");
+                    Hospital.log("Doctor " + id + " begins treating Patient "
+                            + patient.getPatientId() + ".");
+
+                    Thread.sleep(1000 + random.nextInt(2000));
+
+                    Hospital.log("Patient " + patient.getPatientId()
+                            + " finishes treatment.");
+                    Hospital.log("Patient " + patient.getPatientId()
+                            + " leaves the hospital.");
+                    hospital.patientFinished();
+                } finally {
+                    // Always return the room, even if treatment is interrupted.
+                    hospital.getTreatmentRoom().release();
                     Hospital.log("Doctor " + id
-                            + " begins treating P" + patient.id + ".");
-
-                    try {
-
-                        // Random treatment duration: 1 to 3 seconds
-                        int treatmentTime =
-                                1000 + random.nextInt(2000);
-
-                        Thread.sleep(treatmentTime);
-
-                        Hospital.log("Doctor " + id
-                                + " finished treating P" + patient.id + ".");
-
-                    } finally {
-
-                        // Release treatment room
-                        hospital.treatmentRooms.V();
-
-                        Hospital.log("Doctor " + id
-                                + " released the treatment room.");
-                    }
-
-                    Hospital.log("P" + patient.id + " left.");
-
-                    Hospital.log("Doctor " + id
-                            + " is now available.");
-
-                    // Notify main thread that one patient is finished
-                    hospital.completed.V();
-
-                } else {
-
-                    Hospital.log("Doctor " + id
-                            + " could not acquire a treatment room.");
-
-                    Hospital.log("Doctor " + id
-                            + " is sending P" + patient.id
-                            + " back to the waiting room.");
-
-                    // Return patient to waiting room
-                    hospital.waitingRoom.put(patient);
-
-                    Hospital.log("Doctor " + id
-                            + " is now available.");
+                            + " releases the treatment room.");
                 }
             }
-
-        } catch (InterruptedException e) {
-
+        } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
         }
     }

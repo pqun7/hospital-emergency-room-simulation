@@ -1,134 +1,58 @@
-class Buffer {
+public class WaitingRoom {
 
-    private Patient[] store;
+    private final Patient[] patients;
+    private int nextPatient = 0;
+    private int nextDoctor = 0;
+    private int numberOfPatients = 0;
 
-    private int in = 0;
-    private int out = 0;
-
-    private int size;
-
-    // Three semaphores
-    private Semaphore spaces;
-    private Semaphore elements;
-    private Semaphore mutex;
-
-    public Buffer(int size) {
-
-        this.size = size;
-
-        store = new Patient[size];
-
-        spaces = new Semaphore(size);
-        elements = new Semaphore(0);
-        mutex = new Semaphore(1);
+    public WaitingRoom(int capacity) {
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Waiting room capacity must be positive.");
+        }
+        patients = new Patient[capacity];
     }
 
-    // Producer: Patient enters waiting room
-    public void put(Patient patient)
-            throws InterruptedException {
-
-        // Check whether the waiting room has a free seat
-        boolean acquired = spaces.tryAcquire(0);
-
-        if (!acquired) {
-
+    public synchronized void enter(Patient patient) throws InterruptedException {
+        while (numberOfPatients == patients.length) {
             Hospital.log("The waiting room is full.");
-
-            Hospital.log("P" + patient.id
-                    + " is waiting outside for an available seat.");
-
-            spaces.P();
+            Hospital.log("Patient " + patient.getPatientId()
+                    + " waits outside for an available seat.");
+            // Wait outside until a seat becomes free.
+            wait();
         }
 
-        try {
-
-            mutex.P();
-
-        } catch (InterruptedException e) {
-
-            spaces.V();
-            throw e;
-        }
-
-        store[in] = patient;
-
-        in = (in + 1) % size;
-
-        mutex.V();
-
-        // Notify consumers that a patient is available
-        elements.V();
-
-        Hospital.log("P" + patient.id
-                + " entered the waiting room.");
+        addPatient(patient);
+        Hospital.log("Patient " + patient.getPatientId() + " enters the waiting room.");
     }
 
-    // Consumer: Doctor takes a patient
-    public Patient take() throws InterruptedException {
-
-        elements.P();
-
-        try {
-
-            mutex.P();
-
-        } catch (InterruptedException e) {
-
-            elements.V();
-            throw e;
+    public synchronized Patient take() throws InterruptedException {
+        while (numberOfPatients == 0) {
+            // Doctors wait until a patient arrives.
+            wait();
         }
 
-        Patient patient = store[out];
-
-        store[out] = null;
-
-        out = (out + 1) % size;
-
-        mutex.V();
-
-        // Notify producers that a seat is available
-        spaces.V();
-
+        Patient patient = patients[nextDoctor];
+        patients[nextDoctor] = null;
+        nextDoctor = (nextDoctor + 1) % patients.length;
+        numberOfPatients--;
+        // A removed patient creates space for another patient.
+        notifyAll();
         return patient;
     }
 
-    public void put(Patient patient) throws InterruptedException {
-
-        boolean stopSignal = patient.id == -1;
-
-        boolean acquired = spaces.tryAcquire(0);
-
-        if (!acquired) {
-
-            if (!stopSignal) {
-                Hospital.log("The waiting room is full.");
-
-                Hospital.log("P" + patient.id
-                        + " is waiting outside for an available seat.");
-            }
-
-            spaces.P();
+    public synchronized void addStopSignal() throws InterruptedException {
+        while (numberOfPatients == patients.length) {
+            wait();
         }
 
-        try {
-            mutex.P();
-        } catch (InterruptedException e) {
-            spaces.V();
-            throw e;
-        }
-
-        store[in] = patient;
-
-        in = (in + 1) % size;
-
-        if (!stopSignal) {
-            Hospital.log("P" + patient.id
-                    + " entered the waiting room.");
-        }
-
-        mutex.V();
-
-        elements.V();
+        addPatient(Doctor.STOP);
+        notifyAll();
     }
 
+    private void addPatient(Patient patient) {
+        patients[nextPatient] = patient;
+        nextPatient = (nextPatient + 1) % patients.length;
+        numberOfPatients++;
+        notifyAll();
+    }
 }

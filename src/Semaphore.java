@@ -1,55 +1,53 @@
+public class Semaphore {
 
+    private int permits;
 
-class Semaphore {
-
-    private int value;
-
-    public Semaphore(int initialValue) {
-        value = initialValue;
+    public Semaphore(int permits) {
+        if (permits < 0) {
+            throw new IllegalArgumentException("Semaphore permits cannot be negative.");
+        }
+        this.permits = permits;
     }
 
-    // P operation
-    public synchronized void P() throws InterruptedException {
-
-        while (value == 0) {
+    public synchronized void acquire() throws InterruptedException {
+        while (permits == 0) {
+            // Wait until a permit is released.
             wait();
         }
-
-        value--;
+        permits--;
     }
 
-    // V operation
-    public synchronized void V() {
-
-        value++;
-
+    public synchronized void release() {
+        permits++;
+        // Wake threads waiting for a permit.
         notifyAll();
     }
 
-    // Try to acquire a resource within a time limit
-    public synchronized boolean tryAcquire(long timeout)
+    public synchronized boolean tryAcquire(long timeoutMilliseconds)
             throws InterruptedException {
+        if (timeoutMilliseconds < 0) {
+            throw new IllegalArgumentException("Timeout cannot be negative.");
+        }
 
         long deadline = System.nanoTime()
-                + timeout * 1_000_000L;
+                + timeoutMilliseconds * 1_000_000L;
 
-        while (value == 0) {
-
+        while (permits == 0) {
             long remaining = deadline - System.nanoTime();
-
             if (remaining <= 0) {
+                // The timeout expired before a permit became available.
                 return false;
             }
 
-            long millis = remaining / 1_000_000L;
-            int nanos = (int) (remaining % 1_000_000L);
-
-            wait(millis, nanos);
+            long milliseconds = remaining / 1_000_000L;
+            int nanoseconds = (int) (remaining % 1_000_000L);
+            if (milliseconds == 0 && nanoseconds == 0) {
+                return false;
+            }
+            wait(milliseconds, nanoseconds);
         }
 
-        value--;
-
+        permits--;
         return true;
     }
 }
-
