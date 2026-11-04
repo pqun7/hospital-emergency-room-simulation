@@ -1,0 +1,70 @@
+Sample Input
+Waiting room capacity: 2
+Number of doctors: 3
+Number of patients: 5
+
+Sample Output (one of the possible scenarios)
+Patients arriving:
+P1 P2 P3 P4 P5
+P1 arrived.
+P1 entered the waiting room.
+P2 arrived.
+P2 entered the waiting room.
+Doctor 1 is assigned to P1.
+Doctor 1 is trying to acquire a treatment room.
+Doctor 2 is assigned to P2.
+Doctor 1 acquired a treatment room.
+Doctor 1 begins treating P1.
+Doctor 2 is trying to acquire a treatment room.
+Doctor 2 acquired a treatment room.
+Doctor 2 begins treating P2.
+P3 arrived.
+P3 entered the waiting room.
+P4 arrived.
+P4 entered the waiting room.
+P5 arrived.
+The waiting room is full.
+P5 is waiting outside for an available seat.
+Doctor 3 is assigned to P3.
+Doctor 3 is trying to acquire a treatment room.
+P5 entered the waiting room.
+Doctor 3 could not acquire a treatment room.
+Doctor 3 is sending P3 back to the waiting room.
+The waiting room is full.
+P3 is waiting outside for an available seat.
+Doctor 1 finished treating P1.
+Doctor 1 released the treatment room.
+Doctor 1 is now available.
+P1 left.
+Doctor 1 is assigned to P4.
+P3 entered the waiting room.
+Doctor 3 is now available.
+Doctor 3 is assigned to P5.
+Doctor 3 is trying to acquire a treatment room.
+Doctor 3 acquired a treatment room.
+Doctor 3 begins treating P5.
+Doctor 1 is trying to acquire a treatment room.
+Doctor 2 finished treating P2.
+Doctor 2 released the treatment room.
+Doctor 2 is now available.
+Doctor 1 acquired a treatment room.
+Doctor 1 begins treating P4.
+P2 left.
+Doctor 2 is assigned to P3.
+Doctor 2 is trying to acquire a treatment room.
+Doctor 1 finished treating P4.
+Doctor 1 released the treatment room.
+Doctor 2 acquired a treatment room.
+Doctor 2 begins treating P3.
+Doctor 1 is now available.
+P4 left.
+Doctor 3 finished treating P5.
+Doctor 3 released the treatment room.
+Doctor 3 is now available.
+P5 left.
+Doctor 2 finished treating P3.
+Doctor 2 released the treatment room.
+Doctor 2 is now available.
+P3 left.
+All patients have been treated.
+Simulation completed.

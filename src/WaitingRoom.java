@@ -1,5 +1,9 @@
-public class WaitingRoom {
+// importent rules
 
+// WaitingRoom	    0 <= numberOfPatients <= capacity
+// TreatmentRoom	0 <= permits <= 2
+
+public class WaitingRoom {
 
     // 1- determine the capacity of the waiting room
     private final Patient[] patients;
@@ -42,6 +46,8 @@ public class WaitingRoom {
         numberOfPatients--;
         // A removed patient creates space for another patient.
         notifyAll();
+        Hospital.log(
+                "Patients remaining: " + numberOfPatients);
         return patient;
     }
 
@@ -58,6 +64,8 @@ public class WaitingRoom {
         patients[nextPatient] = patient;
         nextPatient = (nextPatient + 1) % patients.length;
         numberOfPatients++;
+        Hospital.log(
+                "Patients in waiting room: " + numberOfPatients);
         notifyAll();
     }
 }

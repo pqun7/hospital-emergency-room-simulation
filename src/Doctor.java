@@ -2,6 +2,7 @@ import java.util.Random;
 
 public class Doctor extends Thread {
 
+    // tell the doctor that his work is done
     public static final Patient STOP = new Patient(-1, null);
 
     private final int id;

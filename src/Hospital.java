@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 public class Hospital {
 
