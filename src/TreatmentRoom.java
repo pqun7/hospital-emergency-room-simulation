@@ -3,7 +3,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TreatmentRoom {
 
-    private static final int NUMBER_OF_ROOMS = 2;
+    public static final int NUMBER_OF_ROOMS = 2;
 
     private final Semaphore availableRooms = new Semaphore(NUMBER_OF_ROOMS, true);
 

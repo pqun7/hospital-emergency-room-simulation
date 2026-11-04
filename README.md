@@ -62,16 +62,23 @@ Invalid or non-numeric input is rejected with a clear message.
 Thread scheduling and treatment times are random, so the exact order differs.
 
 ```text
+Waiting Room Capacity: 2
+Number of Doctors: 3
+Number of Patients: 5
+Number of Treatment Rooms: 2
+
 Patient 1 arrives at the hospital.
-Patient 1 enters the waiting room.
+Patient 1 entered the waiting room.
 Doctor 1 is assigned to Patient 1.
+Doctor 1 is trying to acquire a treatment room.
 Doctor 1 acquired a treatment room.
 Doctor 1 begins treating Patient 1.
-The waiting room is full.
-Patient 4 waits outside for an available seat.
-Patient 1 finishes treatment.
-Patient 1 leaves the hospital.
+Doctor 1 finishes treating Patient 1.
 Doctor 1 releases the treatment room.
-All patients have been treated.
-Simulation completed.
+Doctor 1 is now available.
+Patient 1 leaves the hospital.
+
+
+All patients have been treated successfully.
+Hospital simulation completed.
 ```

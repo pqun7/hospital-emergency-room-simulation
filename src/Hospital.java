@@ -24,6 +24,13 @@ public class Hospital {
                 scanner, "Number of patients: ");
         scanner.close();
 
+        log("");
+        log("Waiting Room Capacity: " + waitingRoomCapacity);
+        log("Number of Doctors: " + numberOfDoctors);
+        log("Number of Patients: " + numberOfPatients);
+        log("Number of Treatment Rooms: " + TreatmentRoom.NUMBER_OF_ROOMS);
+        log("");
+
         waitingRoom = new WaitingRoom(waitingRoomCapacity);
         treatmentRoom = new TreatmentRoom();
         completedPatients = new Semaphore(0);
@@ -60,8 +67,10 @@ public class Hospital {
             doctor.join();
         }
 
-        log("All patients have been treated.");
-        log("Simulation completed.");
+       
+        log("");
+        log("All patients have been treated successfully.");
+        log("Hospital simulation completed.");
     }
 
     private int readPositiveInteger(Scanner scanner, String prompt) {

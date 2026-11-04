@@ -25,16 +25,16 @@ public class Doctor extends Thread {
 
                 Hospital.log("Doctor " + id + " is assigned to Patient "
                         + patient.getPatientId() + ".");
-                Hospital.log("Doctor " + id
-                        + " tries to acquire a treatment room.");
 
+                Hospital.log("Doctor " + id
+                        + " is trying to acquire a treatment room.");
                 // Wait no longer than three seconds for a treatment room.
                 boolean acquired = hospital.getTreatmentRoom().tryAcquire(3000);
                 if (!acquired) {
                     Hospital.log("Doctor " + id
-                            + " cannot acquire a treatment room.");
-                    Hospital.log("Doctor " + id + " sends Patient "
-                            + patient.getPatientId() + " back to the waiting room.");
+                            + " could not acquire a treatment room.");
+                    Hospital.log("Doctor " + id + " returns Patient "
+                            + patient.getPatientId() + " to the waiting room.");
                     hospital.getWaitingRoom().enter(patient);
                     continue;
                 }
@@ -46,16 +46,17 @@ public class Doctor extends Thread {
 
                     Thread.sleep(1000 + random.nextInt(2000));
 
-                    Hospital.log("Patient " + patient.getPatientId()
-                            + " finishes treatment.");
-                    Hospital.log("Patient " + patient.getPatientId()
-                            + " leaves the hospital.");
-                    hospital.patientFinished();
+                    Hospital.log("Doctor " + id + " finishes treating Patient "
+                            + patient.getPatientId() + ".");
                 } finally {
                     // Always return the room, even if treatment is interrupted.
                     hospital.getTreatmentRoom().release();
                     Hospital.log("Doctor " + id
                             + " releases the treatment room.");
+                    Hospital.log("Doctor " + id + " is now available.");
+                    Hospital.log("Patient " + patient.getPatientId()
+                            + " leaves the hospital.");
+                    hospital.patientFinished();
                 }
             }
         } catch (InterruptedException exception) {

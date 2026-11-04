@@ -18,6 +18,7 @@ Doctor 1 begins treating P1.
 Doctor 2 is trying to acquire a treatment room.
 Doctor 2 acquired a treatment room.
 Doctor 2 begins treating P2.
+
 P3 arrived.
 P3 entered the waiting room.
 P4 arrived.
@@ -54,6 +55,7 @@ Doctor 2 is assigned to P3.
 Doctor 2 is trying to acquire a treatment room.
 Doctor 1 finished treating P4.
 Doctor 1 released the treatment room.
+
 Doctor 2 acquired a treatment room.
 Doctor 2 begins treating P3.
 Doctor 1 is now available.

@@ -24,13 +24,13 @@ public class WaitingRoom {
         while (numberOfPatients == patients.length) {
             Hospital.log("The waiting room is full.");
             Hospital.log("Patient " + patient.getPatientId()
-                    + " waits outside for an available seat.");
+                    + " is waiting outside for an available seat.");
             // Wait outside until a seat becomes free.
             wait();
         }
 
         addPatient(patient);
-        Hospital.log("Patient " + patient.getPatientId() + " enters the waiting room.");
+        Hospital.log("Patient " + patient.getPatientId() + " entered the waiting room.");
     }
 
     // The doctor takes a patient from the waiting room.
@@ -46,8 +46,6 @@ public class WaitingRoom {
         numberOfPatients--;
         // A removed patient creates space for another patient.
         notifyAll();
-        Hospital.log(
-                "Patients remaining: " + numberOfPatients);
         return patient;
     }
 
@@ -64,8 +62,6 @@ public class WaitingRoom {
         patients[nextPatient] = patient;
         nextPatient = (nextPatient + 1) % patients.length;
         numberOfPatients++;
-        Hospital.log(
-                "Patients in waiting room: " + numberOfPatients);
         notifyAll();
     }
 }
