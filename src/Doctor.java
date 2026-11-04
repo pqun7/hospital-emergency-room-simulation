@@ -1,8 +1,6 @@
 import java.util.Random;
 
 public class Doctor extends Thread {
-
-    // tell the doctor that his work is done
     public static final Patient STOP = new Patient(-1, null);
 
     private final int id;
@@ -23,42 +21,36 @@ public class Doctor extends Thread {
                     return;
                 }
 
-                Hospital.log("Doctor " + id + " is assigned to Patient "
-                        + patient.getPatientId() + ".");
-                Hospital.log("Doctor " + id
-                        + " tries to acquire a treatment room.");
+                Hospital.log("Doctor " + id + " is assigned to P" + patient.getPatientId() + ".");
+                Hospital.log("Doctor " + id + " is trying to acquire a treatment room.");
 
-                // Wait no longer than three seconds for a treatment room.
+                // Wait up to 3 seconds to acquire a treatment room
                 boolean acquired = hospital.getTreatmentRoom().tryAcquire(3000);
+
                 if (!acquired) {
-                    Hospital.log("Doctor " + id
-                            + " cannot acquire a treatment room.");
-                    Hospital.log("Doctor " + id + " sends Patient "
-                            + patient.getPatientId() + " back to the waiting room.");
+                    Hospital.log("Doctor " + id + " could not acquire a treatment room.");
+                    Hospital.log("Doctor " + id + " is sending P" + patient.getPatientId() + " back to the waiting room.");
                     hospital.getWaitingRoom().enter(patient);
                     continue;
                 }
 
                 try {
                     Hospital.log("Doctor " + id + " acquired a treatment room.");
-                    Hospital.log("Doctor " + id + " begins treating Patient "
-                            + patient.getPatientId() + ".");
+                    Hospital.log("Doctor " + id + " begins treating P" + patient.getPatientId() + ".");
 
-                    Thread.sleep(1000 + random.nextInt(2000));
+                    // Treatment duration longer than 3s to guarantee timeouts when all rooms are busy
+                    Thread.sleep(3500 + random.nextInt(1000));
 
-                    Hospital.log("Patient " + patient.getPatientId()
-                            + " finishes treatment.");
-                    Hospital.log("Patient " + patient.getPatientId()
-                            + " leaves the hospital.");
-                    hospital.patientFinished();
+                    Hospital.log("Doctor " + id + " finished treating P" + patient.getPatientId() + ".");
                 } finally {
-                    // Always return the room, even if treatment is interrupted.
                     hospital.getTreatmentRoom().release();
-                    Hospital.log("Doctor " + id
-                            + " releases the treatment room.");
+                    Hospital.log("Doctor " + id + " released the treatment room.");
+                    Hospital.log("Doctor " + id + " is now available.");
+                    Hospital.log("P" + patient.getPatientId() + " left.");
+                    hospital.patientFinished();
                 }
             }
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }

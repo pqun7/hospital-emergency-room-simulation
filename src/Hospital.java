@@ -1,11 +1,10 @@
 import java.util.Scanner;
-import java.util.concurrent.Semaphore;
 
 public class Hospital {
 
     private WaitingRoom waitingRoom;
     private TreatmentRoom treatmentRoom;
-    private Semaphore completedPatients;
+    private Semaphore completedPatients; // استخدام كلاس الـ Semaphore المخصص بدلاً من الجاهز
     private int numberOfDoctors;
     private int numberOfPatients;
 
@@ -31,31 +30,42 @@ public class Hospital {
         Doctor[] doctors = new Doctor[numberOfDoctors];
         Patient[] patients = new Patient[numberOfPatients];
 
+        // 1- طباعة قائمة المرضى المبدئية مطابقة للسامبل تماماً
+        StringBuilder sb = new StringBuilder("Patients arriving:\n");
+        for (int i = 1; i <= numberOfPatients; i++) {
+            sb.append("P").append(i).append(i == numberOfPatients ? "" : " ");
+        }
+        log(sb.toString());
+
+        // 2- تشغيل ثريدات الأطباء في الخلفية
         for (int i = 0; i < numberOfDoctors; i++) {
             doctors[i] = new Doctor(i + 1, this);
             doctors[i].start();
         }
 
+        // 3- تشغيل ثريدات المرضى بالتتابع لضمان وصول P1 ثم P2...
         for (int i = 0; i < numberOfPatients; i++) {
             patients[i] = new Patient(i + 1, this);
             patients[i].start();
+            Thread.sleep(150); // فاصل زمني لتنظيم طابور الوصول
         }
 
+        // انتظار وصول جميع ثريدات المرضى لغرفة الانتظار
         for (Patient patient : patients) {
-            // Wait for every patient thread to enter the system.
             patient.join();
         }
 
+        // الانتظار حتى انتهاء كشف جميع المرضى
         for (int i = 0; i < numberOfPatients; i++) {
-            // Wait until every patient has completed treatment.
             completedPatients.acquire();
         }
 
+        // إرسال إشارات التوقف للأطباء لإنهاء عملهم بسلام
         for (int i = 0; i < numberOfDoctors; i++) {
-            // Stop signals let doctors finish after all patients are done.
             waitingRoom.addStopSignal();
         }
 
+        // انتظار انتهاء ثريدات الأطباء
         for (Doctor doctor : doctors) {
             doctor.join();
         }
@@ -79,7 +89,7 @@ public class Hospital {
         }
     }
 
-    public synchronized void patientFinished() {
+    public void patientFinished() {
         completedPatients.release();
     }
 

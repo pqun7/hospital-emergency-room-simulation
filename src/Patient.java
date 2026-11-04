@@ -1,5 +1,4 @@
 public class Patient extends Thread {
-
     private final int id;
     private final Hospital hospital;
 
@@ -15,9 +14,9 @@ public class Patient extends Thread {
     @Override
     public void run() {
         try {
-            Hospital.log("Patient " + id + " arrives at the hospital.");
+            Hospital.log("P" + id + " arrived.");
             hospital.getWaitingRoom().enter(this);
-        } catch (InterruptedException exception) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }

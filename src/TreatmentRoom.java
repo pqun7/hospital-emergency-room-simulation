@@ -1,21 +1,12 @@
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
 public class TreatmentRoom {
+    // Only two treatment rooms exist in the department
+    private final Semaphore rooms = new Semaphore(2);
 
-    private static final int NUMBER_OF_ROOMS = 2;
-
-    private final Semaphore availableRooms = new Semaphore(NUMBER_OF_ROOMS, true);
-
-    public boolean tryAcquire(long timeoutMilliseconds)
-            throws InterruptedException {
-
-        return availableRooms.tryAcquire(
-                timeoutMilliseconds,
-                TimeUnit.MILLISECONDS);
+    public boolean tryAcquire(long timeoutMilliseconds) throws InterruptedException {
+        return rooms.tryAcquire(timeoutMilliseconds);
     }
 
     public void release() {
-        availableRooms.release();
+        rooms.release();
     }
 }

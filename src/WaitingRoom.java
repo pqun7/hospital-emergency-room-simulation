@@ -1,71 +1,70 @@
-// importent rules
-
-// WaitingRoom	    0 <= numberOfPatients <= capacity
-// TreatmentRoom	0 <= permits <= 2
-
 public class WaitingRoom {
-
-    // 1- determine the capacity of the waiting room
     private final Patient[] patients;
     private int nextPatient = 0;
     private int nextDoctor = 0;
     private int numberOfPatients = 0;
 
+    private final Semaphore mutex;
+    private final Semaphore empty;
+    private final Semaphore full;
+
     public WaitingRoom(int capacity) {
         if (capacity <= 0) {
-            throw new IllegalArgumentException("Waiting room capacity must be positive.");
+            throw new IllegalArgumentException("Waiting room capacity can't be negative value!");
         }
-        // using array to store patients in the waiting room, with a fixed capacity
         patients = new Patient[capacity];
+        this.mutex = new Semaphore(1);
+        this.empty = new Semaphore(capacity);
+        this.full = new Semaphore(0);
     }
 
-    // 2- prevent a patient from entering when the room is already full
-    public synchronized void enter(Patient patient) throws InterruptedException {
-        while (numberOfPatients == patients.length) {
+    public void enter(Patient patient) throws InterruptedException {
+        boolean hadToWait = false;
+
+        // بنفحص تحت حماية الـ Mutex هل الكراسي كلها مشغولة حالياً
+        mutex.acquire();
+        if (numberOfPatients >= patients.length) {
+            hadToWait = true;
             Hospital.log("The waiting room is full.");
-            Hospital.log("Patient " + patient.getPatientId()
-                    + " waits outside for an available seat.");
-            // Wait outside until a seat becomes free.
-            wait();
+            Hospital.log("P" + patient.getPatientId() + " is waiting outside for an available seat.");
         }
+        mutex.release();
 
-        addPatient(patient);
-        Hospital.log("Patient " + patient.getPatientId() + " enters the waiting room.");
-    }
+        // لو مفيش مكان هينام هنا لحد ما دكتور يفضيله كرسي فعلياً
+        empty.acquire();
 
-    // The doctor takes a patient from the waiting room.
-    public synchronized Patient take() throws InterruptedException {
-        while (numberOfPatients == 0) {
-            // Doctors wait until a patient arrives.
-            wait();
-        }
-
-        Patient patient = patients[nextDoctor];
-        patients[nextDoctor] = null;
-        nextDoctor = (nextDoctor + 1) % patients.length; // Circular Queue
-        numberOfPatients--;
-        // A removed patient creates space for another patient.
-        notifyAll();
-        Hospital.log(
-                "Patients remaining: " + numberOfPatients);
-        return patient;
-    }
-
-    public synchronized void addStopSignal() throws InterruptedException {
-        while (numberOfPatients == patients.length) {
-            wait();
-        }
-
-        addPatient(Doctor.STOP);
-        notifyAll();
-    }
-
-    private void addPatient(Patient patient) {
+        // أول ما الكرسي يفضى فعلياً يدخل ويسجل مكانه ويطبع
+        mutex.acquire();
         patients[nextPatient] = patient;
         nextPatient = (nextPatient + 1) % patients.length;
         numberOfPatients++;
-        Hospital.log(
-                "Patients in waiting room: " + numberOfPatients);
-        notifyAll();
+        Hospital.log("P" + patient.getPatientId() + " entered the waiting room.");
+        mutex.release();
+
+        full.release(); // إشعار الأطباء بوجود مريض
+    }
+
+    public Patient take() throws InterruptedException {
+        full.acquire(); // ينتظر لحد ما مريض يدخل
+        mutex.acquire();
+
+        Patient patient = patients[nextDoctor];
+        patients[nextDoctor] = null;
+        nextDoctor = (nextDoctor + 1) % patients.length;
+        numberOfPatients--;
+
+        mutex.release();
+        empty.release(); // تحرير كرسي لمن ينتظر بالخارج
+
+        return patient;
+    }
+
+    public void addStopSignal() throws InterruptedException {
+        empty.acquire();
+        mutex.acquire();
+        patients[nextPatient] = Doctor.STOP;
+        nextPatient = (nextPatient + 1) % patients.length;
+        mutex.release();
+        full.release();
     }
 }
