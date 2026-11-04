@@ -22,15 +22,14 @@ public class WaitingRoom {
     // 2- prevent a patient from entering when the room is already full
     public synchronized void enter(Patient patient) throws InterruptedException {
         while (numberOfPatients == patients.length) {
-            Hospital.log("The waiting room is full.");
-            Hospital.log("Patient " + patient.getPatientId()
-                    + " is waiting outside for an available seat.");
+            Hospital.logEvent("The waiting room is full.");
+            Hospital.logEvent("Patient " + patient.getPatientId() + " is waiting outside for an available seat.");
             // Wait outside until a seat becomes free.
             wait();
         }
 
         addPatient(patient);
-        Hospital.log("Patient " + patient.getPatientId() + " entered the waiting room.");
+        Hospital.logEvent("Patient " + patient.getPatientId() + " entered the waiting room.");
     }
 
     // The doctor takes a patient from the waiting room.
