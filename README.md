@@ -1,7 +1,7 @@
 # Hospital Emergency Room Simulation
 
 This project demonstrates the Producer-Consumer problem using Java threads,
-a bounded buffer, and a custom semaphore.
+a bounded buffer, and semaphore which is built from scratch.
 
 ## Project structure
 
@@ -38,16 +38,6 @@ patients, duplicate treatment, and simultaneous use of one treatment room by
 two doctors. No lock is held while a doctor waits for a treatment room, which
 also avoids a deadlock between these resources.
 
-## Compile and run
-
-From the project directory:
-
-```text
-javac -d out src\*.java
-java -cp out Main
-```
-
-Enter positive values, for example:
 
 ```text
 Waiting room capacity: 2
@@ -55,7 +45,7 @@ Number of doctors: 3
 Number of patients: 5
 ```
 
-Invalid or non-numeric input is rejected with a clear message.
+Negative or non-numeric input is rejected with a clear message.
 
 ## Example output
 
