@@ -1,4 +1,3 @@
-
 import java.util.Random;
 
 public class Doctor extends Thread {
@@ -16,40 +15,36 @@ public class Doctor extends Thread {
 
     @Override
     public void run() {
-
         try {
-
             while (true) {
 
-                Patient patient = hospital.getWaitingRoom().take();
+                Patient patient = hospital.getWaitingRoom().take(id);
 
                 if (patient == STOP) {
                     return;
                 }
 
-                Hospital.logEvent("Doctor " + id + " is assigned to Patient " + patient.getPatientId() + ".");
-
-                Hospital.logEvent("Doctor " + id + " is trying to acquire a treatment room.");
+                Hospital.logEvent(
+                        "Doctor " + id + " is assigned to Patient "
+                                + patient.getPatientId() + ".");
 
                 boolean acquired = hospital.getTreatmentRoom().tryAcquire(3000);
 
-                if (!acquired) {
-
-                    Hospital.logEvent("Doctor " + id + " could not acquire a treatment room.");
+                // Keep waiting until a treatment room becomes available.
+                while (!acquired) {
 
                     Hospital.logEvent(
-                            "Doctor " + id + " returns Patient "
-                                    + patient.getPatientId()
-                                    + " to the waiting room.");
+                            "Doctor " + id
+                                    + " is waiting for a treatment room.");
 
-                    hospital.getWaitingRoom().enter(patient);
-
-                    continue;
+                    acquired = hospital.getTreatmentRoom().tryAcquire(3000);
                 }
 
                 try {
 
-                    Hospital.logEvent("Doctor " + id + " acquired a treatment room.");
+                    Hospital.logEvent(
+                            "Doctor " + id
+                                    + " acquired a treatment room.");
 
                     Hospital.logEvent(
                             "Doctor " + id + " begins treating Patient "
@@ -81,7 +76,6 @@ public class Doctor extends Thread {
             }
 
         } catch (InterruptedException exception) {
-
             Thread.currentThread().interrupt();
         }
     }

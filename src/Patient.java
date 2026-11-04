@@ -15,7 +15,7 @@ public class Patient extends Thread {
     @Override
     public void run() {
         try {
-            Hospital.logEvent("Patient " + id + " arrives at the hospital.");
+
             hospital.getWaitingRoom().enter(this);
 
         } catch (InterruptedException exception) {
