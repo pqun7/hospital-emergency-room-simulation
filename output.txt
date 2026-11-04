@@ -1,72 +1,63 @@
-Sample Input
-Waiting room capacity: 2
-Number of doctors: 3
-Number of patients: 5
+Waiting Room Capacity : 2
+Number of Doctors     : 3
+Number of Patients    : 5
+Treatment Rooms       : 2
 
-Sample Output (one of the possible scenarios)
-Patients arriving:
-P1 P2 P3 P4 P5
-P1 arrived.
-P1 entered the waiting room.
-P2 arrived.
-P2 entered the waiting room.
-Doctor 1 is assigned to P1.
-Doctor 1 is trying to acquire a treatment room.
-Doctor 2 is assigned to P2.
-Doctor 1 acquired a treatment room.
-Doctor 1 begins treating P1.
-Doctor 2 is trying to acquire a treatment room.
+Patient 1 arrives at the hospital.
+Patient 2 arrives at the hospital.
+Patient 3 arrives at the hospital.
+Patient 4 arrives at the hospital.
+Patient 5 arrives at the hospital.
+Patient 1 entered the waiting room (1/2).
+Patient 2 entered the waiting room (2/2).
+Waiting room is FULL (2/2).
+Patient 3 is waiting outside.
+Waiting room is FULL (2/2).
+Patient 4 is waiting outside.
+Waiting room is FULL (2/2).
+Patient 5 is waiting outside.
+Doctor 1 takes Patient 1.
+Patient 3 entered the waiting room (2/2).
+Doctor 2 takes Patient 2.
+Patient 4 entered the waiting room (2/2).
+Doctor 1 is assigned to Patient 1.
+Doctor 2 is assigned to Patient 2.
+Doctor 3 takes Patient 3.
+Patient 5 entered the waiting room (2/2).
 Doctor 2 acquired a treatment room.
-Doctor 2 begins treating P2.
-
-P3 arrived.
-P3 entered the waiting room.
-P4 arrived.
-P4 entered the waiting room.
-P5 arrived.
-The waiting room is full.
-P5 is waiting outside for an available seat.
-Doctor 3 is assigned to P3.
-Doctor 3 is trying to acquire a treatment room.
-P5 entered the waiting room.
-Doctor 3 could not acquire a treatment room.
-Doctor 3 is sending P3 back to the waiting room.
-The waiting room is full.
-P3 is waiting outside for an available seat.
-Doctor 1 finished treating P1.
-Doctor 1 released the treatment room.
-Doctor 1 is now available.
-P1 left.
-Doctor 1 is assigned to P4.
-P3 entered the waiting room.
-Doctor 3 is now available.
-Doctor 3 is assigned to P5.
-Doctor 3 is trying to acquire a treatment room.
+Doctor 3 is assigned to Patient 3.
+Doctor 2 begins treating Patient 2.
+Doctor 1 acquired a treatment room.
+Doctor 1 begins treating Patient 1.
+Doctor 1 finishes treating Patient 1.
 Doctor 3 acquired a treatment room.
-Doctor 3 begins treating P5.
-Doctor 1 is trying to acquire a treatment room.
-Doctor 2 finished treating P2.
-Doctor 2 released the treatment room.
-Doctor 2 is now available.
-Doctor 1 acquired a treatment room.
-Doctor 1 begins treating P4.
-P2 left.
-Doctor 2 is assigned to P3.
-Doctor 2 is trying to acquire a treatment room.
-Doctor 1 finished treating P4.
-Doctor 1 released the treatment room.
-
-Doctor 2 acquired a treatment room.
-Doctor 2 begins treating P3.
+Doctor 1 releases the treatment room.
+Doctor 3 begins treating Patient 3.
 Doctor 1 is now available.
-P4 left.
-Doctor 3 finished treating P5.
-Doctor 3 released the treatment room.
-Doctor 3 is now available.
-P5 left.
-Doctor 2 finished treating P3.
-Doctor 2 released the treatment room.
+Patient 1 leaves the hospital.
+Doctor 1 takes Patient 4.
+Doctor 1 is assigned to Patient 4.
+Doctor 2 finishes treating Patient 2.
+Doctor 2 releases the treatment room.
+Doctor 1 acquired a treatment room.
 Doctor 2 is now available.
-P3 left.
-All patients have been treated.
-Simulation completed.
+Doctor 1 begins treating Patient 4.
+Patient 2 leaves the hospital.
+Doctor 2 takes Patient 5.
+Doctor 2 is assigned to Patient 5.
+Doctor 3 finishes treating Patient 3.
+Doctor 3 releases the treatment room.
+Doctor 3 is now available.
+Doctor 2 acquired a treatment room.
+Patient 3 leaves the hospital.
+Doctor 2 begins treating Patient 5.
+Doctor 1 finishes treating Patient 4.
+Doctor 1 releases the treatment room.
+Doctor 1 is now available.
+Patient 4 leaves the hospital.
+Doctor 2 finishes treating Patient 5.
+Doctor 2 releases the treatment room.
+Doctor 2 is now available.
+Patient 5 leaves the hospital.
+All patients have been treated successfully.
+Hospital simulation completed.

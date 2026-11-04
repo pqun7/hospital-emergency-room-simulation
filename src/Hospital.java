@@ -32,13 +32,6 @@ public class Hospital {
 
         scanner.close();
 
-        log("");
-        log("Waiting Room Capacity : " + waitingRoomCapacity);
-        log("Number of Doctors     : " + numberOfDoctors);
-        log("Number of Patients    : " + numberOfPatients);
-        log("Treatment Rooms       : " + TreatmentRoom.NUMBER_OF_ROOMS);
-        log("");
-
         // create the waiting room with the specified capacity.
         waitingRoom = new WaitingRoom(
                 waitingRoomCapacity, numberOfPatients);
